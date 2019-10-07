@@ -17,7 +17,7 @@ const getAllSessions = async () => {
     }
   }
   ORDER BY ASC(?plannedstart)
-  LIMIT 366`
+  LIMIT 366`;
 	const data = await mu.query(query);
 	return parseSparqlResults(data);
 };
@@ -36,13 +36,15 @@ const getClosestMeeting = async (date, sort, sign) => {
 			besluit:geplandeStart ?plannedstart .
 			?agendas besluit:isAangemaaktVoor ?session ;
 			mu:uuid ?agenda_id ;
-			ext:agendaNaam ?agendaName ;
-			ext:aangemaaktOp ?creationDate .
+			ext:agendaNaam ?agendaName .
 			FILTER(str(?plannedstart) ${sign} "${date.toISOString()}")
+			OPTIONAL {
+			  ?agendas ext:aangemaaktOp ?creationDate .
+			}
     }
   }
   ORDER BY ${sort}(?plannedstart) ${sort}(?creationDate)
-	LIMIT 1`
+	LIMIT 1`;
 
 	let data = await mu.query(query);
 	return parseSparqlResults(data);
