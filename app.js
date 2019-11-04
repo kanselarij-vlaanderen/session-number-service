@@ -31,7 +31,7 @@ app.get('/assignNewSessionNumbers', async function(req, res) {
 app.get('/activeAgendas', async function(req, res) {
   try {
     const date = new Date(req.query.date);
-    const meetings = await repository.getActiveAgendas(date, 'ASC', '>');
+    const meetings = await repository.getActiveAgendas(date);
     if (meetings) {
       res.send({
         status: ok,
@@ -55,5 +55,25 @@ app.get('/activeAgendas', async function(req, res) {
     });
   }
 });
+
+app.get('/closestMeeting', async function (req, res) {
+  try {
+    const date = new Date(req.query.date);
+    const sessions = await repository.getClosestMeeting(date);
+    if (sessions) {
+      res.send({ status: ok, statusCode: 200, body: { closestMeeting: sessions[0] } })
+    } else {
+      res.send({ status: ok, statusCode: 400, body: { message: "No meeting found." } })
+    }
+  } catch (e) {
+    res.send({
+      status: ok,
+      statusCode: 403,
+      body: {
+        message: "Not a correct date parameter."
+      }
+    })
+  }
+})
 
 mu.app.use(mu.errorHandler);

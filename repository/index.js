@@ -22,7 +22,35 @@ const getAllSessions = async () => {
 	return parseSparqlResults(data);
 };
 
-const getActiveAgendas = async (date, sort, sign) => {
+const getClosestMeeting = async (date) => {
+	const query = `
+  PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
+	PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
+	PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
+  
+  SELECT ?session ?meeting_id ?plannedstart ?agendaName ?agenda_id ?creationDate WHERE {
+    GRAPH <${targetGraph}> 
+    {
+      ?session a besluit:Zitting ;
+      mu:uuid ?meeting_id ;
+			besluit:geplandeStart ?plannedstart .
+			?agendas besluit:isAangemaaktVoor ?session ;
+			mu:uuid ?agenda_id ;
+			ext:agendaNaam ?agendaName .
+			FILTER(str(?plannedstart) < "${date.toISOString()}")
+			OPTIONAL {
+			  ?agendas ext:aangemaaktOp ?creationDate .
+			}
+    }
+  }
+  ORDER BY DESC(?plannedstart) DESC(?creationDate)
+	LIMIT 1`;
+
+	let data = await mu.query(query);
+	return parseSparqlResults(data);
+};
+
+const getActiveAgendas = async (date) => {
 	const dateToFilter = setDateTimeOnZero(date);
 	const query = `
   PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
@@ -39,13 +67,13 @@ const getActiveAgendas = async (date, sort, sign) => {
 			?agendas besluit:isAangemaaktVoor ?meeting ;
 			mu:uuid ?agenda_id ;
 			ext:agendaNaam ?agendaName .
-			FILTER(str(?plannedstart) ${sign} "${dateToFilter.toISOString()}")
+			FILTER(str(?plannedstart) > "${dateToFilter.toISOString()}")
 			OPTIONAL {
 			  ?agendas ext:aangemaaktOp ?creationDate .
 			}
     }
   }
-  ORDER BY ${sort}(?plannedstart)`
+  ORDER BY ASC (?plannedstart)`
 
 	let data = await mu.query(query);
 	return parseSparqlResults(data);
@@ -110,5 +138,6 @@ const setDateTimeOnZero = (date) => {
 module.exports = {
 	getAllSessions,
 	getActiveAgendas,
-	updateSessionNumbers
+	updateSessionNumbers,
+	getClosestMeeting
 };
