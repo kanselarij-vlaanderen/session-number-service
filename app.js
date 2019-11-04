@@ -36,7 +36,7 @@ app.get('/activeAgendas', async function(req, res) {
       res.send({
         status: ok,
         statusCode: 200,
-        body: { closestMeeting: meetings[0] },
+        body: { agendas: meetings },
       });
     } else {
       res.send({

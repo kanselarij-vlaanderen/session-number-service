@@ -33,7 +33,7 @@ const getActiveAgendas = async (date, sort, sign) => {
     GRAPH <${targetGraph}> 
     {
 			?meeting a besluit:Zitting ;
-			?meeting ext:finaleZittingVersie "false"^^<http://mu.semte.ch/vocabularies/typed-literals/boolean> ;
+			ext:finaleZittingVersie "false"^^<http://mu.semte.ch/vocabularies/typed-literals/boolean> ;
       mu:uuid ?meeting_id ;
 			besluit:geplandeStart ?plannedstart .
 			?agendas besluit:isAangemaaktVoor ?meeting ;
