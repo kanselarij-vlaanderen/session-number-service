@@ -10,7 +10,7 @@ const repository = require('./repository');
 app.use(cors());
 app.use(bodyParser.json({ type: 'application/*+json' }));
 
-app.get('/assignNewSessionNumbers', async function (req, res) {
+app.get('/assignNewSessionNumbers', async function(req, res) {
   let sessions = await repository.getAllSessions();
 
   for (let i = 0; i < sessions.length; i++) {
@@ -23,35 +23,43 @@ app.get('/assignNewSessionNumbers', async function (req, res) {
     statusCode: 200,
     body: {
       sessions: sessions,
-      updateMessage: updatedDate
-    }
+      updateMessage: updatedDate,
+    },
   });
 });
 
-app.get('/closestMeeting', async function (req, res) {
+app.get('/activeAgendas', async function(req, res) {
   try {
     const date = new Date(req.query.date);
-    const sessions = await repository.getClosestMeeting(date, "DESC", "<");
-    if (sessions) {
-      res.send({ status: ok, statusCode: 200, body: { closestMeeting: sessions[0] } })
+    const meetings = await repository.getActiveAgendas(date);
+    if (meetings) {
+      res.send({
+        status: ok,
+        statusCode: 200,
+        body: { agendas: meetings },
+      });
     } else {
-      res.send({ status: ok, statusCode: 400, body: { message: "No meeting found." } })
+      res.send({
+        status: ok,
+        statusCode: 400,
+        body: { message: 'No active agendas found.' },
+      });
     }
   } catch (e) {
     res.send({
       status: ok,
       statusCode: 403,
       body: {
-        message: "Not a correct date parameter."
-      }
-    })
+        message: 'Not a correct date parameter.',
+      },
+    });
   }
-})
+});
 
-app.get('/closestFutureMeeting', async function (req, res) {
+app.get('/closestMeeting', async function (req, res) {
   try {
     const date = new Date(req.query.date);
-    const sessions = await repository.getClosestMeeting(date, "ASC", ">");
+    const sessions = await repository.getClosestMeeting(date);
     if (sessions) {
       res.send({ status: ok, statusCode: 200, body: { closestMeeting: sessions[0] } })
     } else {
