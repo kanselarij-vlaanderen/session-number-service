@@ -46,6 +46,7 @@ app.get('/activeAgendas', async function(req, res) {
       });
     }
   } catch (e) {
+    console.error(e);
     res.send({
       status: ok,
       statusCode: 403,

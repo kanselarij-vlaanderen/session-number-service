@@ -37,7 +37,7 @@ const getClosestMeeting = async (date) => {
       mu:uuid ?meeting_id ;
 			besluit:geplandeStart ?plannedstart .
 			?agendas besluitvorming:isAgendaVoor ?session ;
-			mu:uuid ?agenda_id ;
+			mu:uuid ?agenda_id .
 			FILTER(str(?plannedstart) < "${date.toISOString()}")
 			OPTIONAL {
 			  ?agendas dct:created ?creationDate .
@@ -60,7 +60,7 @@ const getActiveAgendas = async (date) => {
   PREFIX besluitvorming: <http://data.vlaanderen.be/ns/besluitvorming#>
   PREFIX dct: <http://purl.org/dc/terms/>
 
-  SELECT ?meeting ?meeting_id ?plannedstart ?agendaName ?agenda_id ?creationDate WHERE {
+  SELECT ?meeting ?meeting_id ?plannedstart ?agenda_id ?creationDate WHERE {
     GRAPH <${targetGraph}> 
     {
 			?meeting a besluit:Vergaderactiviteit ;
@@ -68,7 +68,7 @@ const getActiveAgendas = async (date) => {
       mu:uuid ?meeting_id ;
 			besluit:geplandeStart ?plannedstart .
 			?agendas besluitvorming:isAgendaVoor ?meeting ;
-			mu:uuid ?agenda_id ;
+			mu:uuid ?agenda_id .
 			FILTER(str(?plannedstart) > "${dateToFilter.toISOString()}")
 			OPTIONAL {
 			  ?agendas dct:created ?creationDate .
