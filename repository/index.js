@@ -10,7 +10,7 @@ const getAllSessions = async () => {
   SELECT ?session WHERE {
     GRAPH <${targetGraph}> 
     {
-      ?session a besluit:Zitting ;
+      ?session a besluit:Vergaderactiviteit ;
       mu:uuid ?uuid ;
       besluit:geplandeStart ?plannedstart .
       FILTER(str(?plannedstart) > "${firstDayOfTheYear.toISOString()}")
@@ -27,19 +27,20 @@ const getClosestMeeting = async (date) => {
   PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
 	PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
 	PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-  
-  SELECT ?session ?meeting_id ?plannedstart ?agendaName ?agenda_id ?creationDate WHERE {
+  PREFIX besluitvorming: <http://data.vlaanderen.be/ns/besluitvorming#>
+  PREFIX dct: <http://purl.org/dc/terms/>
+
+  SELECT ?session ?meeting_id ?plannedstart ?agenda_id ?creationDate WHERE {
     GRAPH <${targetGraph}> 
     {
-      ?session a besluit:Zitting ;
+      ?session a besluit:Vergaderactiviteit ;
       mu:uuid ?meeting_id ;
 			besluit:geplandeStart ?plannedstart .
-			?agendas besluit:isAangemaaktVoor ?session ;
-			mu:uuid ?agenda_id ;
-			ext:agendaNaam ?agendaName .
+			?agendas besluitvorming:isAgendaVoor ?session ;
+			mu:uuid ?agenda_id .
 			FILTER(str(?plannedstart) < "${date.toISOString()}")
 			OPTIONAL {
-			  ?agendas ext:aangemaaktOp ?creationDate .
+			  ?agendas dct:created ?creationDate .
 			}
     }
   }
@@ -56,20 +57,21 @@ const getActiveAgendas = async (date) => {
   PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
 	PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
 	PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
-  
-  SELECT ?meeting ?meeting_id ?plannedstart ?agendaName ?agenda_id ?creationDate WHERE {
+  PREFIX besluitvorming: <http://data.vlaanderen.be/ns/besluitvorming#>
+  PREFIX dct: <http://purl.org/dc/terms/>
+
+  SELECT ?meeting ?meeting_id ?plannedstart ?agenda_id ?creationDate WHERE {
     GRAPH <${targetGraph}> 
     {
-			?meeting a besluit:Zitting ;
+			?meeting a besluit:Vergaderactiviteit ;
 			ext:finaleZittingVersie "false"^^<http://mu.semte.ch/vocabularies/typed-literals/boolean> ;
       mu:uuid ?meeting_id ;
 			besluit:geplandeStart ?plannedstart .
-			?agendas besluit:isAangemaaktVoor ?meeting ;
-			mu:uuid ?agenda_id ;
-			ext:agendaNaam ?agendaName .
+			?agendas besluitvorming:isAgendaVoor ?meeting ;
+			mu:uuid ?agenda_id .
 			FILTER(str(?plannedstart) > "${dateToFilter.toISOString()}")
 			OPTIONAL {
-			  ?agendas ext:aangemaaktOp ?creationDate .
+			  ?agendas dct:created ?creationDate .
 			}
     }
   }
