@@ -1,5 +1,7 @@
 import mu from 'mu';
 const targetGraph = "http://mu.semte.ch/graphs/organizations/kanselarij";
+const publicGraph = "http://mu.semte.ch/graphs/public";
+const annexKind = 'http://kanselarij.vo.data.gift/id/concept/ministerraad-type-codes/d36138a9-07f0-4df6-bbf0-abd51a24e4ce';
 
 const getAllSessions = async () => {
 	const firstDayOfTheYear = new Date(new Date().getFullYear(), 0, 1);
@@ -23,32 +25,41 @@ const getAllSessions = async () => {
 };
 
 const getClosestMeeting = async (date) => {
-	const query = `
+  const query = `
   PREFIX besluit: <http://data.vlaanderen.be/ns/besluit#>
 	PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
 	PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
   PREFIX besluitvorming: <http://data.vlaanderen.be/ns/besluitvorming#>
   PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
   SELECT ?session ?meeting_id ?plannedstart ?agenda_id ?creationDate WHERE {
-    GRAPH <${targetGraph}> 
+    GRAPH <${targetGraph}>
     {
       ?session a besluit:Vergaderactiviteit ;
-      mu:uuid ?meeting_id ;
+                        mu:uuid ?meeting_id ;
+                        dct:type ?meetingKind ;
 			besluit:geplandeStart ?plannedstart .
-			?agendas besluitvorming:isAgendaVoor ?session ;
+      ?agendas besluitvorming:isAgendaVoor ?session ;
 			mu:uuid ?agenda_id .
-			FILTER(str(?plannedstart) < "${date.toISOString()}")
-			OPTIONAL {
-			  ?agendas dct:created ?creationDate .
-			}
+      OPTIONAL {
+        ?agendas dct:created ?creationDate .
+      }
+    }
+    FILTER(str(?plannedstart) < "${date.toISOString()}")
+    GRAPH <${publicGraph}>
+    {
+        ?meetingKind a ext:MinisterraadType .
+        FILTER NOT EXISTS {
+            ?meetingKind skos:broader+ ?broader .
+        }
     }
   }
   ORDER BY DESC(?plannedstart) DESC(?creationDate)
-	LIMIT 1`;
+  LIMIT 1`;
 
-	let data = await mu.query(query);
-	return parseSparqlResults(data);
+  const data = await mu.query(query);
+  return parseSparqlResults(data);
 };
 
 const getActiveAgendas = async (date) => {
