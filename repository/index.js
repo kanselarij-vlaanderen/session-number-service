@@ -31,6 +31,7 @@ const getClosestMeeting = async (date) => {
 	PREFIX ext: <http://mu.semte.ch/vocabularies/ext/>
   PREFIX besluitvorming: <http://data.vlaanderen.be/ns/besluitvorming#>
   PREFIX dct: <http://purl.org/dc/terms/>
+  PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
   SELECT ?session ?meeting_id ?plannedstart ?agenda_id ?creationDate WHERE {
     GRAPH <${targetGraph}>
