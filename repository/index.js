@@ -1,7 +1,7 @@
 import mu from 'mu';
 const targetGraph = "http://mu.semte.ch/graphs/organizations/kanselarij";
 const publicGraph = "http://mu.semte.ch/graphs/public";
-const annexKind = 'http://themis.vlaanderen.be/id/concept/vergaderactiviteit-type/30d6a064-8cca-4485-8b37-7ab2357d931d';
+const meetingKindsScheme = 'http://themis.vlaanderen.be/id/concept-scheme/8030c0c4-aff1-4548-92d9-3299ebc43832';
 
 const getAllSessions = async () => {
 	const firstDayOfTheYear = new Date(new Date().getFullYear(), 0, 1);
@@ -49,7 +49,8 @@ const getClosestMeeting = async (date) => {
     FILTER(str(?plannedstart) < "${date.toISOString()}")
     GRAPH <${publicGraph}>
     {
-        ?meetingKind a ext:MinisterraadType .
+        ?meetingKind a skos:Concept ;
+          skos:inScheme <${meetingKindsScheme}> .
         FILTER NOT EXISTS {
             ?meetingKind skos:broader+ ?broader .
         }
