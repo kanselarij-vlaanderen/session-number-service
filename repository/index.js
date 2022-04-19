@@ -1,7 +1,7 @@
 import mu from 'mu';
 const targetGraph = "http://mu.semte.ch/graphs/organizations/kanselarij";
 const publicGraph = "http://mu.semte.ch/graphs/public";
-const annexKind = 'http://kanselarij.vo.data.gift/id/concept/ministerraad-type-codes/d36138a9-07f0-4df6-bbf0-abd51a24e4ce';
+const annexKind = 'http://themis.vlaanderen.be/id/concept/vergaderactiviteit-type/30d6a064-8cca-4485-8b37-7ab2357d931d';
 
 const getAllSessions = async () => {
 	const firstDayOfTheYear = new Date(new Date().getFullYear(), 0, 1);
