@@ -1,6 +1,5 @@
 import mu from 'mu';
 import { ok } from 'assert';
-import moment from 'moment';
 
 const cors = require('cors');
 const app = mu.app;
