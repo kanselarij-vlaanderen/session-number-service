@@ -1,13 +1,11 @@
 import mu from 'mu';
 import { ok } from 'assert';
+import * as Express from 'express';
 
 const app = mu.app;
-const bodyParser = require('body-parser');
 const repository = require('./repository');
 
-app.use(bodyParser.json({ type: 'application/*+json' }));
-
-app.get('/assignNewSessionNumbers', async function(req, res) {
+app.get('/assignNewSessionNumbers', Express.json(), async function(req, res) {
   let sessions = await repository.getAllSessions();
 
   for (let i = 0; i < sessions.length; i++) {
@@ -25,7 +23,7 @@ app.get('/assignNewSessionNumbers', async function(req, res) {
   });
 });
 
-app.get('/activeAgendas', async function(req, res) {
+app.get('/activeAgendas', Express.json(), async function(req, res) {
   try {
     const date = new Date(req.query.date);
     const meetings = await repository.getActiveAgendas(date);
@@ -54,7 +52,7 @@ app.get('/activeAgendas', async function(req, res) {
   }
 });
 
-app.get('/closestMeeting', async function (req, res) {
+app.get('/closestMeeting', Express.json(), async function (req, res) {
   try {
     const date = new Date(req.query.date);
     const sessions = await repository.getClosestMeeting(date);
