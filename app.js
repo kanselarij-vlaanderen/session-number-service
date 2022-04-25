@@ -1,12 +1,10 @@
 import mu from 'mu';
 import { ok } from 'assert';
 
-const cors = require('cors');
 const app = mu.app;
 const bodyParser = require('body-parser');
 const repository = require('./repository');
 
-app.use(cors());
 app.use(bodyParser.json({ type: 'application/*+json' }));
 
 app.get('/assignNewSessionNumbers', async function(req, res) {
